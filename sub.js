@@ -24,21 +24,30 @@ class Process_sub {
 		
 		// 注入配置
 		if(config){
-			if(config.data){
-				var data = config.data();
-				for(var k in data){
-					this[k] = data[k];
-				}
-			}
-			var methods = config.methods;
-			if(methods){
-				for(var k in methods) {
-					this[k] = methods[k];
-				}
-			}
+			this.set_config(config);
 		}
 	}
 }
+
+/**
+ * 追加配置项
+ * @param {Object} config 配置参数
+ */
+Process_sub.prototype.set_config = function(config){
+	if(config.data){
+		var data = config.data();
+		for(var k in data){
+			this[k] = data[k];
+		}
+	}
+	var methods = config.methods;
+	if(methods){
+		for(var k in methods) {
+			this[k] = methods[k];
+		}
+	}
+}
+
 
 /**
  * 测试用函数

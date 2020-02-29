@@ -12,6 +12,9 @@ async function test () {
 	p.request('test_sub', '你好!', function(res){
 		console.log('返回了:', res);
 	}, p.pids[0]);
+	p.request('test1', '你好!', function(res){
+		console.log('返回了:', res);
+	}, p.pids[0]);
 }
 
 test();

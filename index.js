@@ -34,18 +34,7 @@ class Process {
 		
 		// 注入配置
 		if(config){
-			if(config.data){
-				var data = config.data();
-				for(var k in data){
-					this[k] = data[k];
-				}
-			}
-			var methods = config.methods;
-			if(methods){
-				for(var k in methods) {
-					this[k] = methods[k];
-				}
-			}
+			this.set_config(config);
 		}
 	}
 	
@@ -54,6 +43,25 @@ class Process {
 	 */
 	get pids(){
 		return Object.keys(this.childs);
+	}
+}
+
+/**
+ * 追加配置项
+ * @param {Object} config 配置参数
+ */
+Process.prototype.set_config = function(config){
+	if(config.data){
+		var data = config.data();
+		for(var k in data){
+			this[k] = data[k];
+		}
+	}
+	var methods = config.methods;
+	if(methods){
+		for(var k in methods) {
+			this[k] = methods[k];
+		}
 	}
 }
 
@@ -82,17 +90,27 @@ Process.prototype.test = async function(param) {
  */
 Process.prototype.request = async function(method, param, func, pid) {
 	var child = this.childs[pid];
+	
+	// 随机生成一个ID
+	var date = new Date();
+	var id = date.getTime() + '' + Math.random();
 	if (child) {
-		// 随机生成一个ID
-		var date = new Date();
-		var id = date.getTime() + '' + Math.random();
-		
 		// 往子程序发送消息, 内容为请求方法和参数
 		child.process.send({id, method, param});
 
 		// 如果存在回调函数则添加到函数队列
 		if (func) {
 			child.func_list[id] = func;
+		}
+	}
+	else {
+		for(var k in this.childs) {
+			var o = this.childs[k];
+			o.process.send({id, method, param});
+			// 如果存在回调函数则添加到函数队列
+			if (func) {
+				o.func_list[id] = func;
+			}
 		}
 	}
 };
